@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe Embed Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .input-section {
+            margin-bottom: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+            box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #6c757d;
+            border: 2px solid #e9ecef;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .preview-section {
+            margin-top: 40px;
+        }
+
+        .preview-container {
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            min-height: 200px;
+            padding: 20px;
+            background: #f8f9fa;
+            position: relative;
+        }
+
+        .preview-container.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .preview-container iframe {
+            width: 100%;
+            border: none;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                flex: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Iframe Embed Viewer</h1>
+            <p>Paste your iframe embed code and see it rendered instantly</p>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="form-group">
+                    <label for="iframeCode">Iframe Embed Code:</label>
+                    <textarea 
+                        id="iframeCode" 
+                        placeholder="Paste your iframe code here...&#10;&#10;Example:&#10;&lt;iframe src=&quot;https://example.com&quot; width=&quot;100%&quot; height=&quot;400&quot;&gt;&lt;/iframe&gt;"
+                    ></textarea>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-primary" onclick="displayIframe()">Display Iframe</button>
+                    <button class="btn-secondary" onclick="clearCode()">Clear Code</button>
+                    <button class="btn-danger" onclick="clearPreview()">Clear Preview</button>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <h2>Preview</h2>
+                <div id="previewContainer" class="preview-container empty">
+                    <p>Your iframe will appear here after you paste the code and click "Display Iframe"</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function displayIframe() {
+            const iframeCode = document.getElementById('iframeCode').value.trim();
+            const previewContainer = document.getElementById('previewContainer');
+            
+            if (!iframeCode) {
+                alert('Please enter some iframe code first!');
+                return;
+            }
+            
+            // Check if the code contains an iframe tag
+            if (!iframeCode.toLowerCase().includes('<iframe')) {
+                alert('Please enter valid iframe code!');
+                return;
+            }
+            
+            // Create a temporary div to parse the HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = iframeCode;
+            
+            // Find the iframe element
+            const iframe = tempDiv.querySelector('iframe');
+            
+            if (!iframe) {
+                alert('No valid iframe found in the provided code!');
+                return;
+            }
+            
+            // Clear the preview container
+            previewContainer.innerHTML = '';
+            previewContainer.className = 'preview-container';
+            
+            // Clone the iframe and add it to the preview
+            const clonedIframe = iframe.cloneNode(true);
+            previewContainer.appendChild(clonedIframe);
+            
+            // Scroll to the preview
+            previewContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function clearCode() {
+            document.getElementById('iframeCode').value = '';
+        }
+        
+        function clearPreview() {
+            const previewContainer = document.getElementById('previewContainer');
+            previewContainer.innerHTML = '<p>Your iframe will appear here after you paste the code and click "Display Iframe"</p>';
+            previewContainer.className = 'preview-container empty';
+        }
+        
+        // Allow Enter key to trigger display
+        document.getElementById('iframeCode').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                displayIframe();
+            }
+        });
+        
+        // Auto-resize textarea
+        document.getElementById('iframeCode').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.max(120, this.scrollHeight) + 'px';
+        });
+    </script>
+</body>
+</html> 
